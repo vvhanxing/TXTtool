@@ -41,7 +41,7 @@ def getLineElement(Lines):
                 
 
 
-    f.close()
+    
     return line_numbers
 
 #print( getLineElement(My_Lines) )
