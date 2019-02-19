@@ -2,6 +2,8 @@ f = open("number.txt","r")
 
 My_Lines = (f.readlines() )
 
+f.close()
+
 def getLineElement(Lines):
 
     
