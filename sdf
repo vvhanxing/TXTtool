@@ -1,0 +1,321 @@
+from rdkit import Chem
+
+from rdkit.Chem import AllChem
+
+from rdkit.Chem import Descriptors
+
+import numpy as np
+
+import pandas as pd
+
+
+def get_csv_smi(csv_name):
+    
+    
+    df = pd.read_csv(csv_name)
+    columns_name = list(df.columns.values)
+    print(columns_name)
+    
+    csv_indexs = []
+    for item in columns_name:
+        
+        csv_indexs.extend( [columns_name.index(x) for x in columns_name if item in x] ) 
+
+
+    porp_list = []
+    
+    for row_index in range(100):
+        smiles_list = []
+        for porp in csv_indexs:
+            #print(porp)
+            smiles_list.append(df.iloc[row_index,porp])
+        
+        porp_list.append(smiles_list) 
+
+    return list(zip(*porp_list)) 
+
+
+#csv_name = "BB registration.csv" 
+#smiles, STEREOCHEM, EF, MOL_WEIGHT, COMPOUND_ID, SUPPLIER, COMMENT =  get_csv_smi(csv_name)
+#print(smiles)
+#input()
+
+
+
+
+
+def opt_mol_from_smi(smi,save_name,COMPOUND_ID,SUPPLIER):
+    """
+    opt mol from smiles
+    """
+    mol = Chem.MolFromSmiles(smi)
+ 
+
+
+
+
+
+    
+    mol = Chem.AddHs(mol)
+    AllChem.EmbedMolecule( mol,randomSeed=3 )
+    AllChem.MMFFOptimizeMolecule(mol)
+
+    STEREOCHEM = ""
+    Chem.AssignAtomChiralTagsFromStructure(mol)
+    # 找到分子的手性中心
+    chiral_center = Chem.FindMolChiralCenters(mol)     
+    if len(chiral_center)>=1 and "@" not in smi:
+        STEREOCHEM = "[RAC]"
+        print("####################################")
+
+
+    mol = Chem.rdmolops.RemoveHs(mol)
+    EF = Chem.rdMolDescriptors.CalcMolFormula(mol)
+    MOL_WEIGHT = round(Descriptors.MolWt(mol), 4) #分子质量
+
+
+    writer = Chem.SDWriter(save_name)
+    mol.SetProp('_Name', 'Chemistry '+save_name.split(".")[0])
+    mol.SetProp('STEREOCHEM',  STEREOCHEM)
+    mol.SetProp('EF', EF)
+    mol.SetProp('MOL_WEIGHT', str(MOL_WEIGHT))
+    mol.SetProp('COMPOUND_ID', COMPOUND_ID)
+    mol.SetProp('SUPPLIER', SUPPLIER)
+    mol.SetProp('COMMEN', "")
+    writer.write(mol)
+    return save_name+".mol"
+
+
+
+
+
+
+def cat(name_list):
+    all_lines = []
+    for name in name_list:
+        with open(name,"r") as txt:
+            all_lines.extend(txt.readlines())
+    with open("result.sdf","w") as txt:
+        txt.writelines(all_lines)
+        
+
+
+
+        
+def operating_sdf_pos(file_name,m,save_file_name):
+    """
+
+    """
+    with open(file_name,"r") as txt:
+        lines = txt.readlines()
+        start = 0
+        end = 0
+        for index, line in enumerate(lines):
+            #print(line)
+            if "V2000" in line and index+1:
+                start = index+1
+                end = index+int(line.split()[0])+1
+                #print("-----------------------------------",start,end)
+        pos = lines[start:end]
+        
+        pos = [ np.array([float(j) for k, j in  enumerate(i.split()) if k<3 ]) for i in pos ]
+
+
+
+    lines_a = lines[:start]
+    lines_b = []
+
+    for index ,p in enumerate(pos):
+
+        #print(p)
+        p =  p.dot(m)
+        p_x  = p[0]
+        p_y  = p[1]
+        p_z  = p[2]
+        #print(str(round(p_z,4)))
+        #print( lines[index])
+        space_x = " "
+        if p_x< 0:
+            space_x = ""
+        str_x = space_x + str(round(p_x,4))+"0"*(4-len( str(round(p_x,4)).split(".")[1] ))
+
+        space_y = " "
+        if p_y< 0:
+            space_y = ""
+        str_y = space_y + str(round(p_y,4))+"0"*(4-len( str(round(p_y,4)).split(".")[1] ))
+
+        space_z = " "
+        if p_z< 0:
+            space_z = ""
+        str_z = space_z + str(round(p_z,4))+"0"*(4-len( str(round(p_z,4)).split(".")[1] ))
+
+
+        lines_b.append("   "+str_x+"   "+str_y+"   "+str_z + lines[start+index][30:])  
+
+    #input("")
+    lines_c = lines[end:]
+    lines = []
+    lines.extend(lines_a)    
+    lines.extend(lines_b)
+    lines.extend(lines_c)
+
+    
+    with open(save_file_name,"w") as txt:
+        txt.writelines(lines )
+
+
+    return pos
+
+
+def get_sdf_chiral_center(file_name):
+    mols_suppl = Chem.SDMolSupplier(file_name)
+
+    for mol in mols_suppl: 
+         # mol3的类型=<class 'rdkit.Chem.rdchem.Mol'>
+         #print('类型=',type(mol))  
+         mol = Chem.AddHs(mol)
+         AllChem.EmbedMolecule( mol,randomSeed=3 )
+         AllChem.MMFFOptimizeMolecule(mol)
+
+
+
+
+         Chem.AssignAtomChiralTagsFromStructure(mol)
+         # 找到分子的手性中心
+         chiral_center = Chem.FindMolChiralCenters(mol) 
+         print(chiral_center)
+    return chiral_center   
+
+
+
+
+
+def get_RMS(file_name_a,file_name_b):
+
+    mols_suppl = Chem.SDMolSupplier(file_name_a)
+    for mol_i in mols_suppl: 
+         # mol3的类型=<class 'rdkit.Chem.rdchem.Mol'>
+         #print('类型=',type(mol))  
+
+         Chem.AssignAtomChiralTagsFromStructure(mol_i)
+
+
+    mols_suppl = Chem.SDMolSupplier(file_name_b)
+    for mol_j in mols_suppl: 
+         # mol3的类型=<class 'rdkit.Chem.rdchem.Mol'>
+         #print('类型=',type(mol))  
+
+         Chem.AssignAtomChiralTagsFromStructure(mol_j)
+
+    
+
+    return AllChem.GetBestRMS( mol_i,mol_j)
+
+
+
+def Rotation( theta,aix):
+    R = np.ones([3,3])
+
+
+
+    if aix == "x":
+        R = np.array([[   1, 0,             0            ],
+                        [ 0, np.cos(theta),-np.sin(theta)],
+                        [ 0, np.sin(theta), np.cos(theta)]])
+
+
+
+    if aix == "y":
+        R = np.array([[   np.cos(theta), 0, np.sin(theta)],
+                        [ 0,             1,            0],       
+                        [-np.sin(theta), 0, np.cos(theta)]])
+                        
+
+
+    if aix == "z":
+        R = np.array([[  np.cos(theta),-np.sin(theta),0],
+                        [np.sin(theta), np.cos(theta),0],
+                        [0,             0,            1]])                        
+    return R
+    
+
+
+
+if __name__ == "__main__":
+
+    get_sdf_chiral_center("Chemistry 2.sdf")
+    print("-----------------")
+
+    file_name = "test_out_corrected.sdf"
+    get_sdf_chiral_center(file_name)
+
+    input()
+    input()
+
+
+    #print(get_RMS("28.sdf","28.sdfmirror_rotate0.sdf"))
+    #print(get_RMS("28.sdfmirror_rotate5.sdf","30.sdfmirror_rotate0.sdf"))
+
+
+    #input()
+
+    print("---------------------")
+    from math import pi
+
+
+
+    with open("smi.txt","r") as TXT:
+        name_list = []
+
+        csv_name = "BB registration.csv" 
+        smiles, STEREOCHEM, EF, MOL_WEIGHT, COMPOUND_ID, SUPPLIER, COMMENT =  get_csv_smi(csv_name)
+
+        #lines =  TXT.readlines()
+        for index, smi in enumerate(smiles):
+
+           
+
+
+            print(index,"--------------------------------------------------")
+            save_name = str(index)+".sdf"
+
+
+            COMPOUND_ID_e,SUPPLIER_e = COMPOUND_ID[index],SUPPLIER[index]
+            opt_mol_from_smi(smi,save_name,COMPOUND_ID_e,SUPPLIER_e)
+            s = get_sdf_chiral_center(save_name)
+            #print("1",s)
+            name_list.append(save_name)
+
+
+
+            #save_mirr_name = save_name+"mirror.sdf"
+
+            m = np.array([[1,0,0],
+                          [0,1,0],
+                          [0,0,-1]])
+            #operating_sdf_pos(save_name,m,save_mirr_name)
+            #s = get_sdf_chiral_center(save_mirr_name) 
+            #print("2",s)
+            
+            
+
+            #for i,theta in enumerate( [pi] ): #pi/3,2*pi/3,pi,4*pi/3,5*pi/3,2*pi
+            
+                #save_mirr_rotate_name = save_name+"mirror_rotate"+str(i)+".sdf"
+
+                #m = Rotation(theta,"x")
+                #operating_sdf_pos(save_mirr_name,m,save_mirr_rotate_name)
+                #s = get_sdf_chiral_center(save_mirr_rotate_name) 
+                #print(i,s)
+            #print(get_RMS(save_name,save_mirr_name))
+            #print(get_RMS(save_name,save_mirr_rotate_name))
+            #print(get_RMS(save_mirr_name,save_mirr_rotate_name))
+            print("--------------------------------------------------")
+
+        
+        cat(name_list)
+
+
+
+
+
