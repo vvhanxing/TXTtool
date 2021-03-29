@@ -251,7 +251,8 @@ def F(aixs_point_list):
     
             
     aixs_point_list_new = []
-    eO,eX,eY,eZ =base[0][0], base[0][1]-base[0][0], base[1][1]-base[1][0], base[2][1]-base[2][0]
+    eO = base[0][0]
+    eX,eY,eZ =base[0][1]-eO, base[1][1]-eO, base[2][1]-eO
     for  count,i in enumerate( aixs_point_list[1:]):
         axis = []
         for o,axi in i:
@@ -295,7 +296,7 @@ def get_result(aixs_point_list):
 
     aixs_point_list_result = []
     num  =len(aixs_point_list_new)
-    for i in range(num-1):
+    for i in range(num):
         
     
         aixs_point_list_result.append(aixs_point_list_new[0])
@@ -309,6 +310,11 @@ def get_result(aixs_point_list):
 
 print("~~~~~~~~~~~~~~~~~~~~~")
 
+
+
+
+
+
 a = get_result(aixs_point_list)
 for i in a:
     print("-",i)
@@ -321,6 +327,9 @@ for i in b:
 
 
 input("----------------")
+
+
+
 
 
 
