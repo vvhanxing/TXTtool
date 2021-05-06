@@ -2,6 +2,8 @@ import numpy as np
 
 import random
 
+import copy
+
 def M(eX,eY,eZ):
     a1 =  np.array([eX[0],eY[0],eZ[0]])
     a2 =  np.array([eX[1],eY[1],eZ[1]])
@@ -158,6 +160,7 @@ aixs_point_list =  creat_points ()
 
 
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 #import numpy as np
 
 # Fixing random state for reproducibility
@@ -212,6 +215,91 @@ def plot_point(aixs_point_list):
 plot_point(aixs_point_list)
 
 
+
+
+
+
+
+
+
+
+
+
+def plot_point_ami(aixs_point_list):
+
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    n = 100
+
+    # For each set of style and range settings, plot n random points in the box
+    # defined by x in [23, 32], y in [0, 100], z in [zlow, zhigh].
+    lines_x,lines_y,lines_z = [],[],[]
+    points_x,points_y,points_z = [],[],[]
+    for c,(ox, oy, oz) in enumerate(aixs_point_list):
+        m = random.choice([".","o","^"])
+
+        oo,oa = ox
+        oo,ob = oy
+        oo,oc = oz
+
+        xs = [oo[0],oa[0],ob[0],oc[0]]
+        ys = [oo[1],oa[1],ob[1],oc[1]]
+        zs = [oo[2],oa[2],ob[2],oc[2]]
+        #print("--",xs,ys,zs)
+        #points, = ax.scatter(xs, ys, zs, marker=m)
+        
+
+        xs = [oo[0],oa[0],oo[0],ob[0],oo[0],oc[0]]
+        ys = [oo[1],oa[1],oo[1],ob[1],oo[1],oc[1]]
+        zs = [oo[2],oa[2],oo[2],ob[2],oo[2],oc[2]]
+
+        line,  = ax.plot(xs, ys, zs)
+
+
+        label = str(c)
+        zdir = None
+        #print(oo[0],oo[1],oo[2])
+
+        #ax.text(oo[0],oo[1],oo[2], label, zdir)
+    x = np.arange(0, 4*np.pi, 0.1)
+    def animate(i):
+        line.set_ydata(np.sin(x + i / 50))  # update the data.
+        return line,
+
+
+
+    ani = animation.FuncAnimation(
+        fig, animate, interval=20, blit=True, save_count=50)
+
+
+    ax.set_xlabel('X Label')
+    ax.set_ylabel('Y Label')
+    ax.set_zlabel('Z Label')
+
+    plt.show()
+
+
+
+plot_point_ami(aixs_point_list)
+
+
+input("-----------------")
+
+
+
+
+
+
+
+
+
+
+
+for i in aixs_point_list:
+    print("-",[list([list([k.round(3) for k in j]) for j in  x]) for x in i])
+
 import math
 
 def tran_saixs_point_list(aixs_point_list):
@@ -222,25 +310,33 @@ def tran_saixs_point_list(aixs_point_list):
     for i in aixs_point_list:
         axis = []
         for o,axi in i:
-            print(o,axi ,end = "")
+            #print(o,axi ,end = "")
             m = Rotation( math.pi/2,"z")
             o = o.dot(m)
             axi = axi.dot(m)
             axis.append([o,axi])
         aixs_point_list_new.append(axis)
-        print("---------------")
+        #print("---------------")
     return aixs_point_list_new
 
 
 aixs_point_list_new = tran_saixs_point_list(aixs_point_list)
 
 plot_point(aixs_point_list_new)
+print("--------------------------")
+for i in aixs_point_list_new:
+    print("-",[list([list([k.round(3) for k in j]) for j in  x]) for x in i])
+
+
+print("--------------------------")
+
+
 
 
 def relatively_aixs_point(aix,eX,eY,eZ):
-    eX = norm (eX)
-    eY = norm (eY)
-    eZ = norm (eZ)
+    #eX = norm (eX)
+    #eY = norm (eY)
+    #eZ = norm (eZ)
 
     
     return M(eX,eY,eZ).T.dot(aix)
@@ -269,71 +365,93 @@ def F(aixs_point_list):
 
 
 
-
-
-
-
-
-
-a = F(aixs_point_list)
-print(len(a))
-for i in a:
-    print("-",i)
-
-print("#######")
-
-b = F(aixs_point_list_new)
-for i in b:
-    print("-",i)
-print(len(b))
-
-
-
-
-import copy
-def get_result(aixs_point_list):
+def get_relative_coordinate(aixs_point_list):
     aixs_point_list_new = copy.deepcopy(aixs_point_list)
-
     aixs_point_list_result = []
     num  =len(aixs_point_list_new)
     for i in range(num):
-        
-    
         aixs_point_list_result.append(aixs_point_list_new[0])
-    
-
         aixs_point_list_new = F(aixs_point_list_new)
-
-        print(i,len(aixs_point_list_new))
-
     return aixs_point_list_result
 
-print("~~~~~~~~~~~~~~~~~~~~~")
+
+
+print("------------------------------------------------------111")
 
 
 
-
-
-
-a = get_result(aixs_point_list)
+a = get_relative_coordinate(aixs_point_list)
 for i in a:
-    print("-",i)
+    print("-",[list([list([k.round(3) for k in j]) for j in  x]) for x in i])
 
 print("#######")
 
-b = get_result(aixs_point_list_new)
+b = get_relative_coordinate(aixs_point_list_new)
 for i in b:
-    print("-",i)
+    print("-",[list([list([k.round(3) for k in j]) for j in  x]) for x in i])
 
 
-input("----------------")
-
-
-
+print("-----------------------------------------------------111")
 
 
 
 
+def absolute_aixs_point(aix,eX,eY,eZ):
+    M_r = np.linalg.inv(M(eX,eY,eZ))
+    return M_r.T.dot(aix)
+
+
+
+def inverse_F(aixs_point_list):
+    base = aixs_point_list[0]
+    aixs_point_list_new = [base]
+    eO = base[0][0]
+    eX,eY,eZ =base[0][1]-eO, base[1][1]-eO, base[2][1]-eO
+    for count,i in enumerate(aixs_point_list[1:]):
+        aixs = []
+        for o,axi in i :
+            o_rela = absolute_aixs_point(o,eX,eY,eZ)+eO
+            axi_rela = absolute_aixs_point(axi,eX,eY,eZ)+eO
+            aixs.append([o_rela,axi_rela]) 
+        aixs_point_list_new.append(aixs)
+    return aixs_point_list_new 
+
+
+
+def get_absolute_coordinate(aixs_point_list):
+
+    aixs_point_list_new = copy.deepcopy(aixs_point_list)
+    aixs_point_list_result = []
+    num  =len(aixs_point_list_new)
+    aixs_point_list_temp = []
+    for count,i in enumerate(aixs_point_list_new):
+        if num-count-2 >= 0:
+            aixs_point_list_temp = copy.deepcopy(aixs_point_list_new[num-count-2:])
+            aixs_point_list_temp = inverse_F(aixs_point_list_temp)
+            aixs_point_list_new[num-count-2:] = aixs_point_list_temp
+            aixs_point_list_result = aixs_point_list_temp
+    return aixs_point_list_result
+
+
+
+
+
+print("------------------------------------------------------222")
+
+
+
+aixs_point_list = get_absolute_coordinate(a)
+for i in aixs_point_list:
+    print("-",[list([list([k.round(3) for k in j]) for j in  x]) for x in i])
+
+print("#######")
+
+aixs_point_list_new = get_absolute_coordinate(b)
+for i in aixs_point_list_new:
+    print("-",[list([list([k.round(3) for k in j]) for j in  x]) for x in i])
+
+
+print("-----------------------------------------------------222")
 
 
 
@@ -342,103 +460,3 @@ input("----------------")
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-def relatively_saixs_point_list(aixs_point_list):
-
-
-    aixs_point_list_new = [] 
-
-    for count,i in enumerate( aixs_point_list):
-        axis = []
-        
-        if count==0:
-            
-            eO,eX,eY,eZ = [0,0,0],[1,0,0],[0,1,0],[0,0,1]
-            for o,axi in i:
-
-                
-                
-                
-                o_rela = relatively_aixs_point(o-eO,eX,eY,eZ)
-                
-                axi_rela = relatively_aixs_point(axi-eO,eX,eY,eZ)
-                #print("1",axi_rela)
-
-                #axi_rela = norm(axi_rela)
-
-                #print("2",axi_rela)
-                #input("------")
-                
-
-               
-                #|----|axi = axi+o-np.array([0,0,0])
-                #|    |print(o_rela)
-                #|    |print(axi_rela)
-                #|    |o = o - np.array([0,0,0])
-                #|    |o_rela,axi_rela
-                #|    |o_rela,aci_rela
-                #|    |o_rela,aci_rela
-                #|    |o_rela,aci_rela
-                #|----|o_rela,aci_rela
-
-                axis.append([o_rela,axi_rela])
-            aixs_point_list_new.append(axis)
-            
-        if count>0:
-            last = aixs_point_list_new[count-1]
-            
-
-            eO,eX,eY,eZ =last[0][0], last[0][1]-last[0][0], last[1][1]-last[1][0], last[2][1]-last[2][0]
-           
-            #z,a,b,c = next[0][0],next[0][1],next[1][1],next[2][1]
-            for o,axi in i:
-
-                
-
-                o_rela = relatively_aixs_point(o-eO,eX,eY,eZ)
-
-                axi_rela = relatively_aixs_point(axi-eO,eX,eY,eZ)
-
-                #print("1",axi_rela)
-
-                #axi_rela = norm(axi_rela)
-
-                #print("2",axi_rela)
-                #input("------")                
-                
-                #axi = axi+o-np.array([0,0,0])
-                #o = o - np.array([0,0,0])
-                #print(o_rela)
-                #print(axi_rela)
-                
-                axis.append([o_rela,axi_rela])
-
-            aixs_point_list_new.append(axis)
-        
-
-        print("---------------")
-    return aixs_point_list_new
-
-aixs_point_list_new1 = relatively_saixs_point_list(aixs_point_list)
-print()
-aixs_point_list_new2 = relatively_saixs_point_list(aixs_point_list_new)
-
-print("###############################################################")
-#print(aixs_point_list_new1)
-for i in aixs_point_list_new1:
-    print("->",i)
-print("-----")
-#print(aixs_point_list_new2)
-for i in aixs_point_list_new2:
-    print("->",i)
