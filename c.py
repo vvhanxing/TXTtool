@@ -238,18 +238,16 @@ def plot_point_ami(aixs_point_list):
     # For each set of style and range settings, plot n random points in the box
     # defined by x in [23, 32], y in [0, 100], z in [zlow, zhigh].
 
-    p = np.linspace(0, 2*np.pi, 64)
+    p = np.linspace(0, 2*np.pi, 128)
     for time in p:
-        print(time)
+        #print(time)
         #input()
         plt.cla()
         for c,(ox, oy, oz) in enumerate(aixs_point_list):
             m = random.choice([".","o","^"])
-
             oo,oa = ox
             oo,ob = oy
             oo,oc = oz
-
             aix = "z"#random.choice(["x","y","z"])
             theta =time #random.random()*3.1
             M = Rotation(theta,aix)
@@ -257,32 +255,39 @@ def plot_point_ami(aixs_point_list):
             oa = np.array(oa).dot(M)   
             ob = np.array(ob).dot(M)  
             oc = np.array(oc).dot(M)       
-            #xs = [oo[0],oa[0],ob[0],oc[0]]
-            #ys = [oo[1],oa[1],ob[1],oc[1]]
-            #zs = [oo[2],oa[2],ob[2],oc[2]]
+            xs = [oo[0],oa[0],ob[0],oc[0]]
+            ys = [oo[1],oa[1],ob[1],oc[1]]
+            zs = [oo[2],oa[2],ob[2],oc[2]]
             #print("--",xs,ys,zs)
-            #ax.scatter(xs, ys, zs, marker=m)
+            ax.scatter(xs, ys, zs, marker=m)
 
             xs = [oo[0],oa[0],oo[0],ob[0],oo[0],oc[0]]
             ys = [oo[1],oa[1],oo[1],ob[1],oo[1],oc[1]]
             zs = [oo[2],oa[2],oo[2],ob[2],oo[2],oc[2]]
 
 
-
+            ax.set_xlim3d([-10.0, 10.0])
+            ax.set_ylim3d([-10.0, 10.0])
+            ax.set_zlim3d([-10.0, 10.0])
             ax.plot(xs, ys, zs)
 
             label = str(c)
             zdir = None
             #print(oo[0],oo[1],oo[2])
 
-            #ax.text(oo[0],oo[1],oo[2], label, zdir)
-        plt.pause(0.2)
+            ax.text(oo[0],oo[1],oo[2], label, zdir)
+        plt.pause(0.1)
 
 
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')
     ax.set_zlabel('Z Label')
+
+    ax.set_xlim3d([-10.0, 10.0])
+    ax.set_ylim3d([-10.0, 10.0])
+    ax.set_zlim3d([-10.0, 10.0])
+
 
     plt.show()
 
