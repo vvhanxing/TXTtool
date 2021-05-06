@@ -183,6 +183,9 @@ def plot_point(aixs_point_list):
         oo,oc = oz
 
 
+
+
+
         xs = [oo[0],oa[0],ob[0],oc[0]]
         ys = [oo[1],oa[1],ob[1],oc[1]]
         zs = [oo[2],oa[2],ob[2],oc[2]]
@@ -227,7 +230,6 @@ plot_point(aixs_point_list)
 
 def plot_point_ami(aixs_point_list):
 
-
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
@@ -235,43 +237,47 @@ def plot_point_ami(aixs_point_list):
 
     # For each set of style and range settings, plot n random points in the box
     # defined by x in [23, 32], y in [0, 100], z in [zlow, zhigh].
-    lines_x,lines_y,lines_z = [],[],[]
-    points_x,points_y,points_z = [],[],[]
-    for c,(ox, oy, oz) in enumerate(aixs_point_list):
-        m = random.choice([".","o","^"])
 
-        oo,oa = ox
-        oo,ob = oy
-        oo,oc = oz
+    p = np.linspace(0, 2*np.pi, 64)
+    for time in p:
+        print(time)
+        #input()
+        plt.cla()
+        for c,(ox, oy, oz) in enumerate(aixs_point_list):
+            m = random.choice([".","o","^"])
 
-        xs = [oo[0],oa[0],ob[0],oc[0]]
-        ys = [oo[1],oa[1],ob[1],oc[1]]
-        zs = [oo[2],oa[2],ob[2],oc[2]]
-        #print("--",xs,ys,zs)
-        #points, = ax.scatter(xs, ys, zs, marker=m)
-        
+            oo,oa = ox
+            oo,ob = oy
+            oo,oc = oz
 
-        xs = [oo[0],oa[0],oo[0],ob[0],oo[0],oc[0]]
-        ys = [oo[1],oa[1],oo[1],ob[1],oo[1],oc[1]]
-        zs = [oo[2],oa[2],oo[2],ob[2],oo[2],oc[2]]
+            aix = "z"#random.choice(["x","y","z"])
+            theta =time #random.random()*3.1
+            M = Rotation(theta,aix)
+            oo = np.array(oo).dot(M)  
+            oa = np.array(oa).dot(M)   
+            ob = np.array(ob).dot(M)  
+            oc = np.array(oc).dot(M)       
+            #xs = [oo[0],oa[0],ob[0],oc[0]]
+            #ys = [oo[1],oa[1],ob[1],oc[1]]
+            #zs = [oo[2],oa[2],ob[2],oc[2]]
+            #print("--",xs,ys,zs)
+            #ax.scatter(xs, ys, zs, marker=m)
 
-        line,  = ax.plot(xs, ys, zs)
-
-
-        label = str(c)
-        zdir = None
-        #print(oo[0],oo[1],oo[2])
-
-        #ax.text(oo[0],oo[1],oo[2], label, zdir)
-    x = np.arange(0, 4*np.pi, 0.1)
-    def animate(i):
-        line.set_ydata(np.sin(x + i / 50))  # update the data.
-        return line,
+            xs = [oo[0],oa[0],oo[0],ob[0],oo[0],oc[0]]
+            ys = [oo[1],oa[1],oo[1],ob[1],oo[1],oc[1]]
+            zs = [oo[2],oa[2],oo[2],ob[2],oo[2],oc[2]]
 
 
 
-    ani = animation.FuncAnimation(
-        fig, animate, interval=20, blit=True, save_count=50)
+            ax.plot(xs, ys, zs)
+
+            label = str(c)
+            zdir = None
+            #print(oo[0],oo[1],oo[2])
+
+            #ax.text(oo[0],oo[1],oo[2], label, zdir)
+        plt.pause(0.2)
+
 
 
     ax.set_xlabel('X Label')
