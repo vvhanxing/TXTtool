@@ -65,7 +65,7 @@ def Move( arr, distance,aix):
 
 
 
-
+#------------------------------------
 
 
 s_3 = (3**(1/2))
@@ -87,10 +87,10 @@ e = M(eX,eY,eZ).T.dot(s)
 print( e )
 print("---------------------")
 
+#------------------------------------
 
 
-
-def creat_points ():
+def creat_random_points():
     points_absolute = []
     aixs_array_list = []#np.array([[1,0,0],[0,1,0],[0,0,1]])
     aixs_point_list = []
@@ -118,7 +118,7 @@ def creat_points ():
 
         aix = random.choice(["x","y","z"])
         theta = random.random()*3.1
-        M = Rotation(theta,aix)
+        M = Rotation(theta,aix).dot(M)
         aixX = np.array(aixX).dot(M)
         aixY = np.array(aixY).dot(M)
         aixZ = np.array(aixZ).dot(M)
@@ -136,18 +136,48 @@ def creat_points ():
         aixs_point_list .append( [ox,oy,oz] )
     return  aixs_point_list
     #aixs_info.append([ox,oy,oz])
-aixs_point_list =  creat_points ()
+aixs_point_list =  creat_random_points ()
 #print(len(aixs_point_list))
 
 
+aixs_point_list = [
+
+    [[[0,0,0],[1,0,0]],  [[0,0,0],[0,1,0]],  [[0,0,0],[0,0,1]]],
+    [[[0,0,1],[1,0,1]],  [[0,0,1],[0,1,1]],  [[0,0,1],[0,0,2]]],
+    [[[0,0,2],[1,0,2]],  [[0,0,2],[0,1,2]],  [[0,0,2],[0,0,3]]],
+    [[[0,0,3],[1,0,3]],  [[0,0,3],[0,1,3]],  [[0,0,3],[0,0,4]]]
+
+]
+
+
+#print(aixs_point_list.shape)
+
+
+#aixs_point_list = list(map(norm,list(aixs_point_list)))
+#input(aixs_point_list)
 
 
 
 
 
 
+def transform_aixs_point(aixs_point_list,aix,theta):
+    aixs_point_list = np.array(aixs_point_list)
+    aixs_point_list = aixs_point_list.reshape([4*6,3])
+
+    M = Rotation(theta,aix)  
+    #aixs_point_list_t=aixs_point_list.dot(M)
+    aixs_point_list_t = M.dot(aixs_point_list.T)
+    aixs_point_list_t = aixs_point_list_t.T
+    #print(aixs_point_list.shape,M.shape)
+    #print(aixs_point_list.T.shape)
+
+    aixs_point_list_t = np.array(aixs_point_list_t).reshape([4,3,2,3])
+    return aixs_point_list_t
 
 
+#aix,theta = "z",0.5
+#aixs_point_list = transform_aixs_point(aixs_point_list,aix,theta)
 
 
 
@@ -161,15 +191,53 @@ aixs_point_list =  creat_points ()
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-#import numpy as np
+import mpl_toolkits.mplot3d.axes3d as p3
 
-# Fixing random state for reproducibility
+
+# # Fixing random state for reproducibility
+
+# def plot_point(aixs_point_list):
+
+
+#     #fig = plt.figure()
+#     #ax = fig.add_subplot(111, projection='3d')
+#     fig = plt.figure()
+#     ax = p3.Axes3D(fig)
+
+#     n = 100
+
+#     # For each set of style and range settings, plot n random points in the box
+#     # defined by x in [23, 32], y in [0, 100], z in [zlow, zhigh].
+#     for c,(ox, oy, oz) in enumerate(aixs_point_list):
+#         m = random.choice([".","o","^"])
+
+#         oo,oa = ox
+#         oo,ob = oy
+#         oo,oc = oz
+
+
+
+
+
+#         xs = [oo[0],oa[0],ob[0],oc[0]]
+#         ys = [oo[1],oa[1],ob[1],oc[1]]
+#         zs = [oo[2],oa[2],ob[2],oc[2]]
+#         #print("--",xs,ys,zs)
+#         ax.scatter(xs, ys, zs, marker=m)
+
+#         xs = [oo[0],oa[0],oo[0],ob[0],oo[0],oc[0]]
+#         ys = [oo[1],oa[1],oo[1],ob[1],oo[1],oc[1]]
+#         zs = [oo[2],oa[2],oo[2],ob[2],oo[2],oc[2]]
+
+
 
 def plot_point(aixs_point_list):
 
 
+    #fig = plt.figure()
+    #ax = fig.add_subplot(111, projection='3d')
     fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    ax = p3.Axes3D(fig)
 
     n = 100
 
@@ -217,6 +285,24 @@ def plot_point(aixs_point_list):
 
 plot_point(aixs_point_list)
 
+#         ax.plot(xs, ys, zs)
+
+#         label = str(c)
+#         zdir = None
+#         #print(oo[0],oo[1],oo[2])
+
+#         ax.text(oo[0],oo[1],oo[2], label, zdir)
+
+
+
+#     ax.set_xlabel('X Label')
+#     ax.set_ylabel('Y Label')
+#     ax.set_zlabel('Z Label')
+
+#     plt.show()
+
+
+# plot_point(aixs_point_list)
 
 
 
@@ -228,72 +314,86 @@ plot_point(aixs_point_list)
 
 
 
-def plot_point_ami(aixs_point_list):
 
+def simulation(aixs_point_list,aix):
+
+    #fig = plt.figure()
+    #ax = fig.add_subplot(111, projection='3d')
     fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    ax = p3.Axes3D(fig)
+    m = random.choice([".","o","^"])
 
-    n = 100
 
-    # For each set of style and range settings, plot n random points in the box
-    # defined by x in [23, 32], y in [0, 100], z in [zlow, zhigh].
 
     p = np.linspace(0, 2*np.pi, 128)
-    for time in p:
-        #print(time)
-        #input()
+    for time,theta in enumerate(p):
+        
+        oos = []  #坐标原点连线
+        
         plt.cla()
-        for c,(ox, oy, oz) in enumerate(aixs_point_list):
-            m = random.choice([".","o","^"])
+
+        for index,(ox, oy, oz) in enumerate(transform_aixs_point(aixs_point_list,aix,theta)):
+            
             oo,oa = ox
             oo,ob = oy
             oo,oc = oz
-            aix = "z"#random.choice(["x","y","z"])
-            theta =time #random.random()*3.1
-            M = Rotation(theta,aix)
-            oo = np.array(oo).dot(M)  
-            oa = np.array(oa).dot(M)   
-            ob = np.array(ob).dot(M)  
-            oc = np.array(oc).dot(M)       
+            
             xs = [oo[0],oa[0],ob[0],oc[0]]
             ys = [oo[1],oa[1],ob[1],oc[1]]
             zs = [oo[2],oa[2],ob[2],oc[2]]
-            #print("--",xs,ys,zs)
             ax.scatter(xs, ys, zs, marker=m)
+
 
             xs = [oo[0],oa[0],oo[0],ob[0],oo[0],oc[0]]
             ys = [oo[1],oa[1],oo[1],ob[1],oo[1],oc[1]]
             zs = [oo[2],oa[2],oo[2],ob[2],oo[2],oc[2]]
-
-
-            ax.set_xlim3d([-10.0, 10.0])
-            ax.set_ylim3d([-10.0, 10.0])
-            ax.set_zlim3d([-10.0, 10.0])
             ax.plot(xs, ys, zs)
 
-            label = str(c)
+
+
+
+            oos.append(oo)
+            if index>0:
+                xs = [oos[index-1][0],oos[index][0]]
+                ys = [oos[index-1][1],oos[index][1]]
+                zs = [oos[index-1][2],oos[index][2]]  
+            ax.plot(xs, ys, zs)              
+
+
+
+            label = str(index)
             zdir = None
             #print(oo[0],oo[1],oo[2])
-
+            
             ax.text(oo[0],oo[1],oo[2], label, zdir)
-        plt.pause(0.1)
+
+            ax.text(oa[0],oa[1],oa[2], "x", zdir)
+            ax.text(ob[0],ob[1],ob[2], "y", zdir)
+            ax.text(oc[0],oc[1],oc[2], "z", zdir)
+
+            ax.set_xlim3d([-5.0, 5.0])
+            ax.set_ylim3d([-5.0, 5.0])
+            ax.set_zlim3d([  .0,10.0])
+            ax.set_xlabel('X Label')
+            ax.set_ylabel('Y Label')
+            ax.set_zlabel('Z Label')
+
+
+        plt.pause(0.01)
+        
 
 
 
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_zlabel('Z Label')
 
-    ax.set_xlim3d([-10.0, 10.0])
-    ax.set_ylim3d([-10.0, 10.0])
-    ax.set_zlim3d([-10.0, 10.0])
+
+
 
 
     plt.show()
 
 
-
-plot_point_ami(aixs_point_list)
+aix = "z"
+simulation(aixs_point_list,aix)
 
 
 input("-----------------")
