@@ -311,8 +311,6 @@ def plot_point(aixs_point_list):
 
 
 
-
-
 def simulation(aixs_point_list,aix):
 
     #fig = plt.figure()
@@ -367,75 +365,82 @@ def simulation(aixs_point_list,aix):
         z = np.array([1,0])
         ax.plot( s*x+dx, s*y+dy, s*z+dz ) 
 
-
-    p = np.linspace(0, 2*np.pi, 128)
-    for theta in p:
+    def action1():
+        p = np.linspace(0, 2*np.pi, 128)
+        for theta in p:
         
-        oos = []  #坐标原点连线
+            oos = []  #坐标原点连线
         
-        plt.cla()
+            plt.cla()
         
 
-        for index,(ox, oy, oz) in enumerate(transform_aixs_point(aixs_point_list,aix,theta)):
+            for index,(ox, oy, oz) in enumerate(transform_aixs_point(aixs_point_list,aix,theta)):
             
-            oo,oa = ox
-            oo,ob = oy
-            oo,oc = oz
 
 
-            if index == 0:
-                draw_circle(oo,"z",50,1)
-            if index == 2:
-                draw_circle(oo,"x",50,0.4)     
-
-            if index == 4:
-                draw_circle(oo,"x",50,0.4)                 
-
-            if index == 5:
-                draw_circle(oo,"x",50,0.4)
-            draw_box([0,4,0],1)
+                #environment
+                draw_box([0,4,0],1)
 
 
-            xs = [oo[0],oa[0],ob[0],oc[0]]
-            ys = [oo[1],oa[1],ob[1],oc[1]]
-            zs = [oo[2],oa[2],ob[2],oc[2]]
-            ax.scatter(xs, ys, zs, marker=m)
-
-            xs = [oo[0],oa[0],oo[0],ob[0],oo[0],oc[0]]
-            ys = [oo[1],oa[1],oo[1],ob[1],oo[1],oc[1]]
-            zs = [oo[2],oa[2],oo[2],ob[2],oo[2],oc[2]]
-            ax.plot(xs, ys, zs)
+                oo,oa = ox
+                oo,ob = oy
+                oo,oc = oz
 
 
-            oos.append(oo)
-            if index>0:
-                xs = [oos[index-1][0],oos[index][0]]
-                ys = [oos[index-1][1],oos[index][1]]
-                zs = [oos[index-1][2],oos[index][2]]  
-            ax.plot(xs, ys, zs)              
+                #part
+
+                if index == 1:
+                    draw_circle(oo,"z",50,1)                  
+                if index == 3:
+                    draw_circle(oo,"x",50,0.4)     
+                if index == 4:
+                    draw_circle(oo,"x",50,0.4)                 
+                if index == 5:
+                    draw_circle(oo,"x",50,0.4)
 
 
-            label = str(index)
-            zdir = None
+
+                xs = [oo[0],oa[0],ob[0],oc[0]]
+                ys = [oo[1],oa[1],ob[1],oc[1]]
+                zs = [oo[2],oa[2],ob[2],oc[2]]
+                ax.scatter(xs, ys, zs, marker=m)
+
+                xs = [oo[0],oa[0],oo[0],ob[0],oo[0],oc[0]]
+                ys = [oo[1],oa[1],oo[1],ob[1],oo[1],oc[1]]
+                zs = [oo[2],oa[2],oo[2],ob[2],oo[2],oc[2]]
+                ax.plot(xs, ys, zs)
+
+
+                oos.append(oo)
+                if index>0:
+                    xs = [oos[index-1][0],oos[index][0]]
+                    ys = [oos[index-1][1],oos[index][1]]
+                    zs = [oos[index-1][2],oos[index][2]]  
+                ax.plot(xs, ys, zs)              
+                zdir = None
             
-            
-            ax.text(oo[0],oo[1],oo[2], label, zdir)
+                label = str(index)
+                ax.text(oo[0],oo[1],oo[2], label, zdir)
 
-            ax.text(oa[0],oa[1],oa[2], "x", zdir)
-            ax.text(ob[0],ob[1],ob[2], "y", zdir)
-            ax.text(oc[0],oc[1],oc[2], "z", zdir)
+                ax.text(oa[0],oa[1],oa[2], "x", zdir)
+                ax.text(ob[0],ob[1],ob[2], "y", zdir)
+                ax.text(oc[0],oc[1],oc[2], "z", zdir)
 
 
-            ax.set_xlim3d([-6.0, 6.0])
-            ax.set_ylim3d([-6.0, 6.0])
-            ax.set_zlim3d([  .0,12.0])
-            ax.set_xlabel('X Label')
-            ax.set_ylabel('Y Label')
-            ax.set_zlabel('Z Label')
-        plt.pause(0.01)
+                ax.set_xlim3d([-6.0, 6.0])
+                ax.set_ylim3d([-6.0, 6.0])
+                ax.set_zlim3d([  .0,12.0])
+                ax.set_xlabel('X Label')
+                ax.set_ylabel('Y Label')
+                ax.set_zlabel('Z Label')
+            plt.pause(0.01)
+        
+    action1()
+
+
+
     plt.show()
-
-
+        
 
 
 
@@ -758,7 +763,6 @@ for i in aixs_point_list_new:
 
 
 print("-----------------------------------------------------222")
-
 
 
 
