@@ -1,0 +1,2 @@
+# TXTtool
+https://mp.weixin.qq.com/s?__biz=MzAxMjMwODMyMQ==&mid=2456389073&idx=4&sn=851a92db1ce7ad1069da7eaa0c3bfcb4&chksm=8c2effdfbb5976c9d328ab83db6e7ca87590f096ad5a2e728490246a175fe4a3646477f7ede3&mpshare=1&scene=24&srcid=0728cmZaSda3PaVSmmYSUvTM&sharer_sharetime=1658983960007&sharer_shareid=79b7418d9903049653381037970ea1f7&ascene=14&devicetype=android-30&version=280019c9&nettype=WIFI&abtest_cookie=AAACAA%3D%3D&lang=zh_CN&exportkey=A%2B1y9wn64S1hlC5ECiO%2FuMs%3D&pass_ticket=PY1ix229pzDbvYduMpyBm1bRwOJsQf9sIL4Y85z5pm7ZbdDVANYUYCR%2FGDNBYyRm&wx_header=3
